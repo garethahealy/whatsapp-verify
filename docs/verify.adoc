@@ -1,0 +1,65 @@
+// tag::picocli-generated-full-manpage[]
+// tag::picocli-generated-man-section-header[]
+:doctype: manpage
+:revnumber: 
+:manmanual: Verify Manual
+:mansource: 
+:man-linkstyle: pass:[blue R < >]
+= verify(1)
+
+// end::picocli-generated-man-section-header[]
+
+// tag::picocli-generated-man-section-name[]
+== Name
+
+verify - Verify phone numbers against LDAP
+
+// end::picocli-generated-man-section-name[]
+
+// tag::picocli-generated-man-section-synopsis[]
+== Synopsis
+
+*verify* [*-hV*] [*-vpn*] [*-o*=_<output>_] *-p*=_<csvPhoneNumbers>_
+
+// end::picocli-generated-man-section-synopsis[]
+
+// tag::picocli-generated-man-section-description[]
+== Description
+
+Verify phone numbers against LDAP
+
+// end::picocli-generated-man-section-description[]
+
+// tag::picocli-generated-man-section-options[]
+== Options
+
+*-h*, *--help*::
+  Show this help message and exit.
+
+*-o*, *--output*=_<output>_::
+  Output to write CSV to
+
+*-p*, *--phone-list*=_<csvPhoneNumbers>_::
+  List of comma separated phone numbers
+
+*-V*, *--version*::
+  Print version information and exit.
+
+*-vpn, --fail-if-no-vpn*::
+  Throw an exception if can't connect to LDAP
+
+// end::picocli-generated-man-section-options[]
+
+// tag::picocli-generated-man-section-arguments[]
+// end::picocli-generated-man-section-arguments[]
+
+// tag::picocli-generated-man-section-commands[]
+// end::picocli-generated-man-section-commands[]
+
+// tag::picocli-generated-man-section-exit-status[]
+// end::picocli-generated-man-section-exit-status[]
+
+// tag::picocli-generated-man-section-footer[]
+// end::picocli-generated-man-section-footer[]
+
+// end::picocli-generated-full-manpage[]
