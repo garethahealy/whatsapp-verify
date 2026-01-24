@@ -1,17 +1,14 @@
 package com.garethahealy.whatsappverify.services;
 
-import com.garethahealy.whatsappverify.factories.LdapConnectionFactory;
 import com.garethahealy.whatsappverify.model.Member;
 import com.google.i18n.phonenumbers.Phonenumber;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
-import org.jboss.logging.Logger;
 import org.junit.jupiter.api.condition.EnabledIf;
 
-import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @QuarkusTest
 class DefaultLdapGuessServiceTest extends AbstractLdapConnection {

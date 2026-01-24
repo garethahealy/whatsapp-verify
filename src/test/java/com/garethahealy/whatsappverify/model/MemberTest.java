@@ -1,8 +1,6 @@
 package com.garethahealy.whatsappverify.model;
 
 import com.google.i18n.phonenumbers.Phonenumber;
-import org.apache.directory.api.ldap.model.filter.FilterEncoder;
-import org.apache.directory.ldap.client.api.search.FilterBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
