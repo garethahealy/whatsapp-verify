@@ -6,7 +6,6 @@ import com.garethahealy.whatsappverify.services.DefaultLdapGuessService;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
-import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -24,7 +23,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
-@Dependent
 @CommandLine.Command(
     name = "verify",
     description = "Verify phone numbers against LDAP",

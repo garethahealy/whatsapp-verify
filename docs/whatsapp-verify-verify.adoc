@@ -2,24 +2,24 @@
 // tag::picocli-generated-man-section-header[]
 :doctype: manpage
 :revnumber: 
-:manmanual: Verify Manual
+:manmanual: Whatsapp-verify Manual
 :mansource: 
 :man-linkstyle: pass:[blue R < >]
-= verify(1)
+= whatsapp-verify-verify(1)
 
 // end::picocli-generated-man-section-header[]
 
 // tag::picocli-generated-man-section-name[]
 == Name
 
-verify - Verify phone numbers against LDAP
+whatsapp-verify-verify - Verify phone numbers against LDAP
 
 // end::picocli-generated-man-section-name[]
 
 // tag::picocli-generated-man-section-synopsis[]
 == Synopsis
 
-*verify* [*-hV*] [*-vpn*] [*-o*=_<output>_] *-p*=_<csvPhoneNumbers>_
+*whatsapp-verify verify* [*-hV*] [*-vpn*] [*-o*=_<output>_] *-p*=_<csvPhoneNumbers>_
 
 // end::picocli-generated-man-section-synopsis[]
 

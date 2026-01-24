@@ -19,7 +19,7 @@ whatsapp-verify - WhatsApp phone number helper utility
 // tag::picocli-generated-man-section-synopsis[]
 == Synopsis
 
-*whatsapp-verify* [COMMAND]
+*whatsapp-verify* [*-hV*] [COMMAND]
 
 // end::picocli-generated-man-section-synopsis[]
 
@@ -31,6 +31,13 @@ WhatsApp phone number helper utility
 // end::picocli-generated-man-section-description[]
 
 // tag::picocli-generated-man-section-options[]
+== Options
+
+*-h*, *--help*::
+  Show this help message and exit.
+
+*-V*, *--version*::
+  Print version information and exit.
 
 // end::picocli-generated-man-section-options[]
 
@@ -39,6 +46,9 @@ WhatsApp phone number helper utility
 
 // tag::picocli-generated-man-section-commands[]
 == Commands
+
+xref:whatsapp-verify-verify.adoc[*verify*]::
+  Verify phone numbers against LDAP
 
 xref:whatsapp-verify-help.adoc[*help*]::
   Display help information about the specified command.

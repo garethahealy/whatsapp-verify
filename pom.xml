@@ -161,7 +161,6 @@
                     <arguments>
                         <argument>--outdir=docs</argument>
                         <argument>com.garethahealy.whatsappverify.commands.WhatsAppVerifyCommand</argument>
-                        <argument>com.garethahealy.whatsappverify.commands.VerifyCommand</argument>
                     </arguments>
                 </configuration>
                 <dependencies>
