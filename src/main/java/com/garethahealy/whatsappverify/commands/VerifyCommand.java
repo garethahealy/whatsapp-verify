@@ -13,7 +13,6 @@ import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.jboss.logging.Logger;
 import picocli.CommandLine;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -39,25 +38,36 @@ public class VerifyCommand implements Runnable {
     boolean failNoVpn;
 
     @Inject
-    Logger logger;
+    private Logger logger;
 
     @Inject
-    DefaultLdapGuessService defaultLdapGuessService;
+    private DefaultLdapGuessService defaultLdapGuessService;
 
     @Inject
-    PhoneNumberUtilConfig phoneNumberUtilConfig;
+    private PhoneNumberUtilConfig phoneNumberUtilConfig;
 
     @Override
     public void run() {
+        if (csvPhoneNumbers == null || csvPhoneNumbers.isBlank()) {
+            logger.info("No phone numbers provided, nothing to verify");
+            return;
+        }
+
         try {
-            if (!Files.exists(Path.of(output))) {
-                new File(output).createNewFile();
+            Path outputPath = Path.of(output);
+            if (!Files.exists(outputPath)) {
+                Path parent = outputPath.getParent();
+                if (parent != null) {
+                    Files.createDirectories(parent);
+                }
+
+                Files.createFile(outputPath);
             }
 
             List<Phonenumber.PhoneNumber> phoneNumbers = parsePhoneNumbers(csvPhoneNumbers);
             List<Member> members = collectMembers(phoneNumbers);
 
-            writeCsv(Path.of(output), members);
+            writeCsv(outputPath, members);
         } catch (IOException | LdapException | NumberParseException e) {
             throw new RuntimeException(e);
         }
@@ -68,12 +78,20 @@ public class VerifyCommand implements Runnable {
 
         PhoneNumberUtil phoneUtil = phoneNumberUtilConfig.get();
         List<String> phoneNumbers = List.of(csvPhoneNumbers.split(","));
-
-        logger.infof("%s phone numbers to verify", phoneNumbers.size());
+        List<String> trimmedPhoneNumbers = new ArrayList<>();
 
         for (String current : phoneNumbers) {
-            Phonenumber.PhoneNumber number = phoneUtil.parse(current, null);
-            number.setRawInput(current.trim());
+            String trimmed = current.trim();
+            if (!trimmed.isEmpty()) {
+                trimmedPhoneNumbers.add(trimmed);
+            }
+        }
+
+        logger.infof("%s phone numbers to verify", trimmedPhoneNumbers.size());
+
+        for (String trimmed : trimmedPhoneNumbers) {
+            Phonenumber.PhoneNumber number = phoneUtil.parse(trimmed, null);
+            number.setRawInput(trimmed);
 
             answer.add(number);
         }
@@ -98,17 +116,17 @@ public class VerifyCommand implements Runnable {
 
     private void writeCsv(Path output, List<Member> members) throws IOException {
         if (members.isEmpty()) {
-            logger.info("Members is empty, ignoring");
-        } else {
-            CSVFormat csvFormat = CSVFormat.Builder.create(CSVFormat.DEFAULT)
-                .setHeader(Member.Headers.class)
-                .get();
+            logger.info("Members is empty, writing headers only");
+        }
 
-            try (Writer writer = Files.newBufferedWriter(output, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING)) {
-                try (CSVPrinter csvPrinter = new CSVPrinter(writer, csvFormat)) {
-                    for (Member current : members) {
-                        csvPrinter.printRecord(current.toArray());
-                    }
+        CSVFormat csvFormat = CSVFormat.Builder.create(CSVFormat.DEFAULT)
+            .setHeader(Member.Headers.class)
+            .get();
+
+        try (Writer writer = Files.newBufferedWriter(output, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+            try (CSVPrinter csvPrinter = new CSVPrinter(writer, csvFormat)) {
+                for (Member current : members) {
+                    csvPrinter.printRecord(current.toArray());
                 }
             }
         }
