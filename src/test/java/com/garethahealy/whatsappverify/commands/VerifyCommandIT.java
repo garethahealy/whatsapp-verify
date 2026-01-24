@@ -16,9 +16,9 @@ class VerifyCommandIT extends BaseCommand {
     @EnabledIf(value = "isRunnerSet")
     void run() throws IOException, InterruptedException, TimeoutException {
         ProcessExecutor executor = new ProcessExecutor()
-                .command(getRunner(), "verify", "--phone-list=+44 7818 511214, +447725078585", "--output=target/whatsapp.csv")
-                .redirectError(System.err)
-                .redirectOutput(System.out);
+            .command(getRunner(), "verify", "--phone-list=+44 7818 511214, +447725078585", "--output=target/whatsapp.csv")
+            .redirectError(System.err)
+            .redirectOutput(System.out);
 
         String command = String.join(" ", executor.getCommand());
         System.out.println("Executing \"" + command + "\"");

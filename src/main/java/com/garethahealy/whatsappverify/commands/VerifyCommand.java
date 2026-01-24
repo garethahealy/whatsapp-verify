@@ -26,9 +26,9 @@ import java.util.List;
 
 @Dependent
 @CommandLine.Command(
-        name = "verify",
-        description = "Verify phone numbers against LDAP",
-        mixinStandardHelpOptions = true)
+    name = "verify",
+    description = "Verify phone numbers against LDAP",
+    mixinStandardHelpOptions = true)
 public class VerifyCommand implements Runnable {
 
     @CommandLine.Option(names = {"-p", "--phone-list"}, description = "List of comma separated phone numbers", required = true)
@@ -103,8 +103,8 @@ public class VerifyCommand implements Runnable {
             logger.info("Members is empty, ignoring");
         } else {
             CSVFormat csvFormat = CSVFormat.Builder.create(CSVFormat.DEFAULT)
-                    .setHeader(Member.Headers.class)
-                    .get();
+                .setHeader(Member.Headers.class)
+                .get();
 
             try (Writer writer = Files.newBufferedWriter(output, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING)) {
                 try (CSVPrinter csvPrinter = new CSVPrinter(writer, csvFormat)) {

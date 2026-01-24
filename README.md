@@ -3,6 +3,7 @@
 CLI to verify phone numbers against LDAP
 
 ## Build
+
 Both JVM and Native mode are supported.
 
 ```bash

@@ -21,7 +21,7 @@ public class WhatsAppVerifyApplication implements QuarkusApplication {
     @Override
     public int run(String... args) throws Exception {
         return new CommandLine(new WhatsAppVerifyCommand())
-                .addSubcommand(verifyCommand)
-                .execute(args);
+            .addSubcommand(verifyCommand)
+            .execute(args);
     }
 }
