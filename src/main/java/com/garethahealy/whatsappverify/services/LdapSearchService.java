@@ -1,22 +1,17 @@
 package com.garethahealy.whatsappverify.services;
 
-import jakarta.annotation.PostConstruct;
+import com.garethahealy.whatsappverify.factories.LdapConnectionFactory;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.apache.directory.api.ldap.model.cursor.EntryCursor;
 import org.apache.directory.api.ldap.model.entry.Attribute;
-import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.exception.LdapInvalidSearchFilterException;
-import org.apache.directory.api.ldap.model.message.SearchScope;
-import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.ldap.client.api.LdapConnection;
-import org.apache.directory.ldap.client.api.LdapNetworkConnection;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.apache.directory.ldap.client.api.search.FilterBuilder;
 import org.jboss.logging.Logger;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
 
 /**
  * Handles searching Red Hat LDAP
@@ -28,43 +23,13 @@ public class LdapSearchService {
         public static final String PrimaryMail = "rhatPrimaryMail";
     }
 
+    private final Logger logger;
+    private final LdapConnectionFactory connectionFactory;
+
     @Inject
-    Logger logger;
-
-    @ConfigProperty(name = "redhat.ldap.dn")
-    String ldapDn;
-
-    @ConfigProperty(name = "redhat.ldap.connection")
-    String ldapConnection;
-
-    @ConfigProperty(name = "redhat.ldap.warmup-user")
-    String ldapWarmupUser;
-
-    private final AtomicBoolean warmedUp = new AtomicBoolean(false);
-    private Dn systemDn;
-
-    public LdapSearchService() {
-    }
-
-    /**
-     * Attempts to connect to LDAP
-     */
-    @PostConstruct
-    void init() {
-        try {
-            systemDn = new Dn(ldapDn);
-            try (LdapConnection connection = open()) {
-                try (EntryCursor cursor = connection.search(systemDn, "(uid=" + ldapWarmupUser + ")", SearchScope.SUBTREE, "dn")) {
-                    for (Entry entry : cursor) {
-                        logger.infof("Warmup found %s", entry.getDn());
-                        warmedUp.set(true);
-                        break;
-                    }
-                }
-            }
-        } catch (IOException | LdapException e) {
-            logger.error("Failed to open connection to LDAP", e);
-        }
+    public LdapSearchService(Logger logger, LdapConnectionFactory connectionFactory) {
+        this.logger = logger;
+        this.connectionFactory = connectionFactory;
     }
 
     /**
@@ -73,11 +38,7 @@ public class LdapSearchService {
      * @return
      */
     public boolean canConnect() {
-        if (!warmedUp.get()) {
-            init();
-        }
-
-        return warmedUp.get();
+        return connectionFactory.canConnect();
     }
 
     /**
@@ -86,7 +47,7 @@ public class LdapSearchService {
      * @return
      */
     public LdapConnection open() {
-        return new LdapNetworkConnection(ldapConnection);
+        return connectionFactory.open();
     }
 
     /**
@@ -99,7 +60,7 @@ public class LdapSearchService {
      * @throws IOException
      */
     public String searchOnMobile(LdapConnection connection, String number) throws LdapException, IOException {
-        String filter = "(mobile=" + number + ")";
+        FilterBuilder filter = FilterBuilder.equal("mobile", number);
         return searchAndGetPrimaryMail(connection, filter);
     }
 
@@ -113,7 +74,7 @@ public class LdapSearchService {
      * @throws IOException
      */
     public String searchOnHomePhone(LdapConnection connection, String number) throws LdapException, IOException {
-        String filter = "(homePhone=" + number + ")";
+        FilterBuilder filter = FilterBuilder.equal("homePhone", number);
         return searchAndGetPrimaryMail(connection, filter);
     }
 
@@ -126,24 +87,17 @@ public class LdapSearchService {
      * @throws LdapException
      * @throws IOException
      */
-    private String searchAndGetPrimaryMail(LdapConnection connection, String filter) throws LdapException, IOException {
+    private String searchAndGetPrimaryMail(LdapConnection connection, FilterBuilder filter) throws LdapException, IOException {
         String answer = "";
 
-        try (EntryCursor cursor = connection.search(systemDn, filter, SearchScope.SUBTREE, AttributeKeys.PrimaryMail)) {
-            int count = 0;
-            for (Entry entry : cursor) {
-                logger.debugf("Found %s", filter);
+        try {
+            List<Attribute> attributes = connectionFactory.search(connection, filter, AttributeKeys.PrimaryMail);
 
-                for (Attribute found : entry.getAttributes()) {
-                    if (found.getId().equalsIgnoreCase(AttributeKeys.PrimaryMail)) {
-                        logger.debugf("- returning %s == %s", AttributeKeys.PrimaryMail, found.get().toString());
-                        answer = found.get().toString();
-                    }
-                }
-
-                count++;
-                if (count >= 2) {
-                    throw new LdapException("cursor returned multiple entries for: " + filter);
+            for (Attribute found : attributes) {
+                if (found.getId().equalsIgnoreCase(AttributeKeys.PrimaryMail)) {
+                    logger.debugf("- returning %s == %s", AttributeKeys.PrimaryMail, found.get().toString());
+                    answer = found.get().toString();
+                    break;
                 }
             }
         } catch (LdapInvalidSearchFilterException ex) {

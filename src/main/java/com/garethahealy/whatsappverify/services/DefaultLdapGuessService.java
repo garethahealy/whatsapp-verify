@@ -16,12 +16,12 @@ import java.io.IOException;
 @ApplicationScoped
 public class DefaultLdapGuessService {
 
-    @Inject
-    Logger logger;
-
+    private final Logger logger;
     private final LdapSearchService ldapSearchService;
 
-    public DefaultLdapGuessService(LdapSearchService ldapSearchService) {
+    @Inject
+    public DefaultLdapGuessService(Logger logger, LdapSearchService ldapSearchService) {
+        this.logger = logger;
         this.ldapSearchService = ldapSearchService;
     }
 
