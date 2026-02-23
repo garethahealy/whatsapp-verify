@@ -11,10 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @QuarkusTest
-class DefaultLdapGuessServiceTest extends AbstractLdapConnection {
+class LdapGuessServiceTest extends AbstractLdapConnection {
 
     @Inject
-    DefaultLdapGuessService service;
+    LdapGuessService service;
 
     @Test
     @EnabledIf("canConnectVpn")
@@ -22,6 +22,7 @@ class DefaultLdapGuessServiceTest extends AbstractLdapConnection {
         Phonenumber.PhoneNumber phoneNumber = new Phonenumber.PhoneNumber().setRawInput("+44 7818 511214");
 
         Member answer = service.attempt(phoneNumber, true);
+
         assertNotNull(answer);
         assertEquals("+44 7818 511214", answer.whatsAppNumber().getRawInput());
         assertEquals("gahealy@redhat.com", answer.redHatEmailAddress());

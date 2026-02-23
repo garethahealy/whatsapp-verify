@@ -2,7 +2,7 @@ package com.garethahealy.whatsappverify.commands;
 
 import com.garethahealy.whatsappverify.config.PhoneNumberUtilConfig;
 import com.garethahealy.whatsappverify.model.Member;
-import com.garethahealy.whatsappverify.services.DefaultLdapGuessService;
+import com.garethahealy.whatsappverify.services.LdapGuessService;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
@@ -41,7 +41,7 @@ public class VerifyCommand implements Runnable {
     private Logger logger;
 
     @Inject
-    private DefaultLdapGuessService defaultLdapGuessService;
+    private LdapGuessService ldapGuessService;
 
     @Inject
     private PhoneNumberUtilConfig phoneNumberUtilConfig;
@@ -103,7 +103,7 @@ public class VerifyCommand implements Runnable {
         List<Member> answer = new ArrayList<>();
 
         for (Phonenumber.PhoneNumber number : phoneNumbers) {
-            Member found = defaultLdapGuessService.attempt(number, failNoVpn);
+            Member found = ldapGuessService.attempt(number, failNoVpn);
             if (found == null) {
                 found = Member.from(number, null);
             }

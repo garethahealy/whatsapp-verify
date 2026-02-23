@@ -14,13 +14,13 @@ import java.io.IOException;
  * Handles searching LDAP and attempts to 'guess' who someone might be, based on their name or user id
  */
 @ApplicationScoped
-public class DefaultLdapGuessService {
+public class LdapGuessService {
 
     private final Logger logger;
     private final LdapSearchService ldapSearchService;
 
     @Inject
-    public DefaultLdapGuessService(Logger logger, LdapSearchService ldapSearchService) {
+    public LdapGuessService(Logger logger, LdapSearchService ldapSearchService) {
         this.logger = logger;
         this.ldapSearchService = ldapSearchService;
     }
