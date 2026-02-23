@@ -1,30 +1,27 @@
 package com.garethahealy.whatsappverify.commands;
 
+import io.quarkus.test.junit.main.Launch;
+import io.quarkus.test.junit.main.LaunchResult;
+import io.quarkus.test.junit.main.QuarkusMainIntegrationTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIf;
-import org.zeroturnaround.exec.ProcessExecutor;
-import org.zeroturnaround.exec.ProcessResult;
 
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class VerifyCommandIT extends BaseCommand {
+@QuarkusMainIntegrationTest
+class VerifyCommandIT {
 
     @Test
-    @EnabledIf(value = "isRunnerSet")
-    void run() throws IOException, InterruptedException, TimeoutException {
-        ProcessExecutor executor = new ProcessExecutor()
-            .command(getRunner(), "verify", "--phone-list=+44 7818 511214, +447725078585", "--output=target/whatsapp.csv")
-            .redirectError(System.err)
-            .redirectOutput(System.out);
+    @Launch({"verify", "--phone-list=+44 7818 511214, +447725078585", "--output=target/whatsapp.csv"})
+    void run(LaunchResult result) {
+        result.echoSystemOut();
 
-        String command = String.join(" ", executor.getCommand());
-        System.out.println("Executing \"" + command + "\"");
-
-        ProcessResult result = executor.execute();
-
-        assertEquals(0, result.getExitValue());
+        assertEquals(0, result.exitCode());
+        assertTrue(Files.exists(Path.of("target/whatsapp.csv")));
+        assertTrue(result.getOutput().contains("-> gahealy@redhat.com found via searchOnRawMobile"));
+        assertTrue(result.getOutput().contains("-> gahealy@redhat.com found via searchOnRawHomePhone"));
     }
 }

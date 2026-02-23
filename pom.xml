@@ -77,12 +77,6 @@
             <artifactId>quarkus-jacoco</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.zeroturnaround</groupId>
-            <artifactId>zt-exec</artifactId>
-            <version>${zt-exec.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
