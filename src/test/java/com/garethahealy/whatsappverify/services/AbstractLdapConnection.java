@@ -25,6 +25,7 @@ abstract class AbstractLdapConnection {
                 String filter = FilterBuilder.equal("uid", ldapWarmupUser).toString();
                 try (EntryCursor cursor = connection.search(new Dn(ldapDn), filter, SearchScope.SUBTREE, "dn")) {
                     for (Entry entry : cursor) {
+                        entry.getDn();
                         canConnect = true;
                         break;
                     }
