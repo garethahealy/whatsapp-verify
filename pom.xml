@@ -192,9 +192,6 @@
             <properties>
                 <skipITs>false</skipITs>
                 <quarkus.native.enabled>true</quarkus.native.enabled>
-                <quarkus.native.additional-build-args>
-                    -H:+UnlockExperimentalVMOptions,-H:ReflectionConfigurationFiles=reflection-config.json,-H:-UnlockExperimentalVMOptions
-                </quarkus.native.additional-build-args>
             </properties>
         </profile>
     </profiles>
