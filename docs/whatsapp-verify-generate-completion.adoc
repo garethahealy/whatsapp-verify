@@ -1,32 +1,36 @@
 // tag::picocli-generated-full-manpage[]
 // tag::picocli-generated-man-section-header[]
 :doctype: manpage
-:revnumber: 
+:revnumber: generate-completion 4.7.7
 :manmanual: Whatsapp-verify Manual
-:mansource: 
+:mansource: generate-completion 4.7.7
 :man-linkstyle: pass:[blue R < >]
-= whatsapp-verify(1)
+= whatsapp-verify-generate-completion(1)
 
 // end::picocli-generated-man-section-header[]
 
 // tag::picocli-generated-man-section-name[]
 == Name
 
-whatsapp-verify - WhatsApp phone number helper utility
+whatsapp-verify-generate-completion - Generate bash/zsh completion script for whatsapp-verify.
 
 // end::picocli-generated-man-section-name[]
 
 // tag::picocli-generated-man-section-synopsis[]
 == Synopsis
 
-*whatsapp-verify* [*-hV*] [COMMAND]
+*whatsapp-verify generate-completion* [*-hV*]
 
 // end::picocli-generated-man-section-synopsis[]
 
 // tag::picocli-generated-man-section-description[]
 == Description
 
-WhatsApp phone number helper utility
+Generate bash/zsh completion script for whatsapp-verify.
+Run the following command to give `whatsapp-verify` TAB completion in the current shell:
+
+  source <(whatsapp-verify generate-completion)
+
 
 // end::picocli-generated-man-section-description[]
 
@@ -45,17 +49,6 @@ WhatsApp phone number helper utility
 // end::picocli-generated-man-section-arguments[]
 
 // tag::picocli-generated-man-section-commands[]
-== Commands
-
-xref:whatsapp-verify-verify.adoc[*verify*]::
-  Verify phone numbers against LDAP
-
-xref:whatsapp-verify-help.adoc[*help*]::
-  Display help information about the specified command.
-
-xref:whatsapp-verify-generate-completion.adoc[*generate-completion*]::
-  Generate bash/zsh completion script for whatsapp-verify.
-
 // end::picocli-generated-man-section-commands[]
 
 // tag::picocli-generated-man-section-exit-status[]
