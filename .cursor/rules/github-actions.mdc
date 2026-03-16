@@ -1,0 +1,26 @@
+---
+description: GitHub Actions CI/CD conventions for whatsapp-verify
+globs: ".github/**"
+alwaysApply: false
+---
+
+# GitHub Actions Standards
+
+- Default permissions must be `read-all`; escalate per-job only as needed.
+- Use `step-security/harden-runner` in build jobs.
+- Pin all action versions by **full commit SHA**, not tags.
+- Use concurrency groups to cancel in-progress runs on the same branch.
+
+# Build Workflow
+
+- Java 25 with `temurin` distribution.
+- Cache Maven dependencies via `actions/setup-java` cache option.
+- Run `dependency-review-action` on pull requests.
+- Build native image, run tests, then run the binary's help command as a smoke test.
+
+# Security
+
+- CodeQL analysis runs after build for Java.
+- Dependency snapshots submitted via `maven-dependency-submission-action`.
+- Renovate manages dependency updates (`renovate.json`).
+- Pre-commit hooks enforce secrets scanning (`rh-pre-commit`), editorconfig, trailing whitespace, and YAML/JSON validation.
