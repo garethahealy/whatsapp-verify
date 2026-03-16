@@ -1,6 +1,5 @@
 package com.garethahealy.whatsappverify.commands;
 
-import com.garethahealy.whatsappverify.config.PhoneNumberUtilConfig;
 import com.garethahealy.whatsappverify.model.Member;
 import com.garethahealy.whatsappverify.services.LdapGuessService;
 import com.google.i18n.phonenumbers.NumberParseException;
@@ -44,7 +43,7 @@ public class VerifyCommand implements Runnable {
     private LdapGuessService ldapGuessService;
 
     @Inject
-    private PhoneNumberUtilConfig phoneNumberUtilConfig;
+    private PhoneNumberUtil phoneNumberUtil;
 
     @Override
     public void run() {
@@ -76,7 +75,6 @@ public class VerifyCommand implements Runnable {
     private List<Phonenumber.PhoneNumber> parsePhoneNumbers(String csvPhoneNumbers) throws NumberParseException {
         List<Phonenumber.PhoneNumber> answer = new ArrayList<>();
 
-        PhoneNumberUtil phoneUtil = phoneNumberUtilConfig.get();
         List<String> phoneNumbers = List.of(csvPhoneNumbers.split(","));
         List<String> trimmedPhoneNumbers = new ArrayList<>();
 
@@ -90,7 +88,7 @@ public class VerifyCommand implements Runnable {
         logger.infof("%s phone numbers to verify", trimmedPhoneNumbers.size());
 
         for (String trimmed : trimmedPhoneNumbers) {
-            Phonenumber.PhoneNumber number = phoneUtil.parse(trimmed, null);
+            Phonenumber.PhoneNumber number = phoneNumberUtil.parse(trimmed, null);
             number.setRawInput(trimmed);
 
             answer.add(number);
