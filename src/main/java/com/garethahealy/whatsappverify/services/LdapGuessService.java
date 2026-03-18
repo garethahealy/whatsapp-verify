@@ -57,11 +57,11 @@ public class LdapGuessService {
             }
         } else {
             if (failNoVpn) {
-                throw new IOException("Unable to connect to LDAP. Are you on the VPN?");
+                throw new RuntimeException("Unable to connect to LDAP. Are you on the VPN?");
             }
         }
 
-        return guessed;
+        return guessed == null ? Member.from(phoneToGuess, null) : guessed;
     }
 
 

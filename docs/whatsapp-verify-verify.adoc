@@ -19,7 +19,8 @@ whatsapp-verify-verify - Verify phone numbers against LDAP
 // tag::picocli-generated-man-section-synopsis[]
 == Synopsis
 
-*whatsapp-verify verify* [*-hV*] [*-vpn*] [*-o*=_<output>_] *-p*=_<csvPhoneNumbers>_
+*whatsapp-verify verify* [*-hV*] [*-vpn*] [*-l*=_<lastOutput>_] [*-o*=_<output>_]
+                       *-p*=_<csvPhoneNumbers>_
 
 // end::picocli-generated-man-section-synopsis[]
 
@@ -35,6 +36,9 @@ Verify phone numbers against LDAP
 
 *-h*, *--help*::
   Show this help message and exit.
+
+*-l*, *--last-output*=_<lastOutput>_::
+  Last output created, if one exists
 
 *-o*, *--output*=_<output>_::
   Output to write CSV to
