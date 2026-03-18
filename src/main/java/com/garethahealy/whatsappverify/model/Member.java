@@ -16,8 +16,8 @@ public record Member(Phonenumber.PhoneNumber whatsAppNumber, String redHatEmailA
         return new Member(whatsAppNumber, redHatEmailAddress);
     }
 
-    public List<String> toArray() {
-        String sanitizedWhatsAppNumber = whatsAppNumber.getRawInput().replace("+", "00").replace(" ", "");
-        return Arrays.asList(sanitizedWhatsAppNumber, redHatEmailAddress);
+    public List<String> toArray(PhoneNumberUtil phoneNumberUtil) {
+        String sanitizedWhatsAppNumber = phoneNumberUtil.format(whatsAppNumber, PhoneNumberUtil.PhoneNumberFormat.E164);
+        return Arrays.asList(sanitizedWhatsAppNumber, redHatEmailAddress.orElse(""));
     }
 }
