@@ -34,6 +34,9 @@ public class LdapGuessService {
      * @throws IOException
      * @throws LdapException
      */
+    @Retry(maxRetries = 3, delay = 5, delayUnit = ChronoUnit.SECONDS,
+        retryOn = {IOException.class, LdapException.class},
+        abortOn = RuntimeException.class)
     public Member attempt(Phonenumber.PhoneNumber phoneToGuess, boolean failNoVpn) throws IOException, LdapException {
         Member guessed = null;
 
