@@ -6,9 +6,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.ldap.client.api.LdapConnection;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.jboss.logging.Logger;
 
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Handles searching LDAP and attempts to 'guess' who someone might be, based on their name or user id
@@ -17,11 +19,15 @@ import java.io.IOException;
 public class LdapGuessService {
 
     private final Logger logger;
-    private final LdapSearchService ldapSearchService;
+    private LdapSearchService ldapSearchService;
 
     @Inject
     public LdapGuessService(Logger logger, LdapSearchService ldapSearchService) {
         this.logger = logger;
+        this.ldapSearchService = ldapSearchService;
+    }
+
+    public void setLdapSearchService(LdapSearchService ldapSearchService) {
         this.ldapSearchService = ldapSearchService;
     }
 
