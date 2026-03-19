@@ -1,8 +1,8 @@
 package com.garethahealy.whatsappverify.factories;
 
+import com.garethahealy.whatsappverify.config.LdapConfig;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import org.apache.directory.api.ldap.model.cursor.EntryCursor;
 import org.apache.directory.api.ldap.model.entry.Attribute;
 import org.apache.directory.api.ldap.model.entry.Entry;
@@ -12,7 +12,6 @@ import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.directory.ldap.client.api.search.FilterBuilder;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 import java.io.IOException;
@@ -24,20 +23,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class LdapConnectionFactory {
 
     private final Logger logger;
-    private final String ldapConnection;
-    private final String ldapDn;
-    private final String ldapWarmupUser;
+    private final LdapConfig ldapConfig;
 
     private final AtomicBoolean warmedUp = new AtomicBoolean(false);
     private volatile Dn systemDn;
 
-    @Inject
-    public LdapConnectionFactory(Logger logger, @ConfigProperty(name = "redhat.ldap.connection") String ldapConnection,
-            @ConfigProperty(name = "redhat.ldap.dn") String ldapDn, @ConfigProperty(name = "redhat.ldap.warmup-user") String ldapWarmupUser) {
+    public LdapConnectionFactory(Logger logger, LdapConfig ldapConfig) {
         this.logger = logger;
-        this.ldapConnection = ldapConnection;
-        this.ldapDn = ldapDn;
-        this.ldapWarmupUser = ldapWarmupUser;
+        this.ldapConfig = ldapConfig;
     }
 
     @PostConstruct
@@ -69,7 +62,7 @@ public class LdapConnectionFactory {
         try {
             Dn dn = getSystemDn();
             try (LdapConnection connection = open()) {
-                String filter = FilterBuilder.equal("uid", ldapWarmupUser).toString();
+                String filter = FilterBuilder.equal("uid", ldapConfig.warmupUser()).toString();
                 try (EntryCursor cursor = connection.search(dn, filter, SearchScope.SUBTREE, "dn")) {
                     for (Entry entry : cursor) {
                         logger.infof("Warmup found %s", entry.getDn());
