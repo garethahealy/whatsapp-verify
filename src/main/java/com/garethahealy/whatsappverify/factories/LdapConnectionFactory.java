@@ -26,7 +26,7 @@ public class LdapConnectionFactory {
     private final LdapConfig ldapConfig;
 
     private final AtomicBoolean warmedUp = new AtomicBoolean(false);
-    private volatile Dn systemDn;
+    private Dn systemDn;
 
     public LdapConnectionFactory(Logger logger, LdapConfig ldapConfig) {
         this.logger = logger;
@@ -35,27 +35,16 @@ public class LdapConnectionFactory {
 
     @PostConstruct
     void init() {
+        setupSystemDn();
         ensureWarmedUp();
     }
 
-    public boolean canConnect() {
-        if (!warmedUp.get()) {
-            ensureWarmedUp();
+    private void setupSystemDn() {
+        try {
+            systemDn = new Dn(ldapConfig.dn());
+        } catch (LdapException ex) {
+            logger.errorf(ex,"Invalid LDAP DN configuration");
         }
-
-        return warmedUp.get();
-    }
-
-    public LdapConnection open() {
-        return new LdapNetworkConnection(ldapConnection);
-    }
-
-    public Dn getSystemDn() throws LdapException {
-        if (systemDn == null) {
-            systemDn = new Dn(ldapDn);
-        }
-
-        return systemDn;
     }
 
     private void ensureWarmedUp() {
@@ -74,6 +63,22 @@ public class LdapConnectionFactory {
         } catch (IOException | LdapException e) {
             logger.error("Failed to open connection to LDAP", e);
         }
+    }
+
+    public Dn getSystemDn() throws LdapException {
+        return systemDn;
+    }
+
+    public boolean canConnect() {
+        if (!warmedUp.get()) {
+            ensureWarmedUp();
+        }
+
+        return warmedUp.get();
+    }
+
+    public LdapConnection open() {
+        return new LdapNetworkConnection(ldapConfig.connection());
     }
 
     public List<Attribute> search(LdapConnection connection, FilterBuilder filter, String... attributes) throws LdapException, IOException {
