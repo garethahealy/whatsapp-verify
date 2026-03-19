@@ -5,8 +5,10 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 class LdapSearchServiceTest extends AbstractLdapConnection {
@@ -17,18 +19,18 @@ class LdapSearchServiceTest extends AbstractLdapConnection {
     @Test
     @EnabledIf("canConnectVpn")
     void searchOnMobile() throws Exception {
-        String result = service.searchOnMobile(service.open(), "+44 7818511214");
+        Optional<String> result = service.searchOnMobile(service.open(), "+44 7818511214");
 
-        assertNotNull(result);
-        assertEquals("gahealy@redhat.com", result);
+        assertTrue(result.isPresent());
+        assertEquals("gahealy@redhat.com", result.get());
     }
 
     @Test
     @EnabledIf("canConnectVpn")
     void searchOnHomePhoneBuildsFilterAndReturnsEmail() throws Exception {
-        String result = service.searchOnHomePhone(service.open(), "+447725078585");
+        Optional<String> result = service.searchOnHomePhone(service.open(), "+447725078585");
 
-        assertNotNull(result);
-        assertEquals("gahealy@redhat.com", result);
+        assertTrue(result.isPresent());
+        assertEquals("gahealy@redhat.com", result.get());
     }
 }

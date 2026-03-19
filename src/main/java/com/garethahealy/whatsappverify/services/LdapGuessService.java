@@ -3,7 +3,6 @@ package com.garethahealy.whatsappverify.services;
 import com.garethahealy.whatsappverify.model.Member;
 import com.google.i18n.phonenumbers.Phonenumber;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.eclipse.microprofile.faulttolerance.Retry;
@@ -11,6 +10,7 @@ import org.jboss.logging.Logger;
 
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 /**
  * Handles searching LDAP and attempts to 'guess' who someone might be, based on their name or user id
@@ -19,15 +19,10 @@ import java.time.temporal.ChronoUnit;
 public class LdapGuessService {
 
     private final Logger logger;
-    private LdapSearchService ldapSearchService;
+    private final LdapSearchService ldapSearchService;
 
-    @Inject
     public LdapGuessService(Logger logger, LdapSearchService ldapSearchService) {
         this.logger = logger;
-        this.ldapSearchService = ldapSearchService;
-    }
-
-    public void setLdapSearchService(LdapSearchService ldapSearchService) {
         this.ldapSearchService = ldapSearchService;
     }
 
@@ -77,11 +72,11 @@ public class LdapGuessService {
     private Member searchOnRawMobile(LdapConnection connection, Phonenumber.PhoneNumber phoneToGuess) throws IOException, LdapException {
         Member answer = null;
 
-        String rhEmail = ldapSearchService.searchOnMobile(connection, phoneToGuess.getRawInput());
-        if (!rhEmail.isEmpty()) {
-            logger.infof("-> %s found via searchOnRawMobile", rhEmail);
+        Optional<String> rhEmail = ldapSearchService.searchOnMobile(connection, phoneToGuess.getRawInput());
+        if (rhEmail.isPresent()) {
+            logger.infof("-> %s found via searchOnRawMobile", rhEmail.get());
 
-            answer = Member.from(phoneToGuess, rhEmail);
+            answer = Member.from(phoneToGuess, rhEmail.get());
         }
 
         return answer;
@@ -90,11 +85,11 @@ public class LdapGuessService {
     private Member searchOnMobileNationalNumberWildcard(LdapConnection connection, Phonenumber.PhoneNumber phoneToGuess) throws IOException, LdapException {
         Member answer = null;
 
-        String rhEmail = ldapSearchService.searchOnMobile(connection, "*" + phoneToGuess.getNationalNumber());
-        if (!rhEmail.isEmpty()) {
-            logger.infof("-> %s found via searchOnMobileNationalNumberWildcard", rhEmail);
+        Optional<String> rhEmail = ldapSearchService.searchOnMobile(connection, "*" + phoneToGuess.getNationalNumber());
+        if (rhEmail.isPresent()) {
+            logger.infof("-> %s found via searchOnMobileNationalNumberWildcard", rhEmail.get());
 
-            answer = Member.from(phoneToGuess, rhEmail);
+            answer = Member.from(phoneToGuess, rhEmail.get());
         }
 
         return answer;
@@ -112,11 +107,11 @@ public class LdapGuessService {
     private Member searchOnRawHomePhone(LdapConnection connection, Phonenumber.PhoneNumber phoneToGuess) throws IOException, LdapException {
         Member answer = null;
 
-        String rhEmail = ldapSearchService.searchOnHomePhone(connection, phoneToGuess.getRawInput());
-        if (!rhEmail.isEmpty()) {
-            logger.infof("-> %s found via searchOnRawHomePhone", rhEmail);
+        Optional<String> rhEmail = ldapSearchService.searchOnHomePhone(connection, phoneToGuess.getRawInput());
+        if (rhEmail.isPresent()) {
+            logger.infof("-> %s found via searchOnRawHomePhone", rhEmail.get());
 
-            answer = Member.from(phoneToGuess, rhEmail);
+            answer = Member.from(phoneToGuess, rhEmail.get());
         }
 
         return answer;
@@ -125,11 +120,11 @@ public class LdapGuessService {
     private Member searchOnHomePhoneNationalNumberWildcard(LdapConnection connection, Phonenumber.PhoneNumber phoneToGuess) throws IOException, LdapException {
         Member answer = null;
 
-        String rhEmail = ldapSearchService.searchOnHomePhone(connection, "*" + phoneToGuess.getNationalNumber());
-        if (!rhEmail.isEmpty()) {
-            logger.infof("-> %s found via searchOnHomePhoneNationalNumberWildcard", rhEmail);
+        Optional<String> rhEmail = ldapSearchService.searchOnHomePhone(connection, "*" + phoneToGuess.getNationalNumber());
+        if (rhEmail.isPresent()) {
+            logger.infof("-> %s found via searchOnHomePhoneNationalNumberWildcard", rhEmail.get());
 
-            answer = Member.from(phoneToGuess, rhEmail);
+            answer = Member.from(phoneToGuess, rhEmail.get());
         }
 
         return answer;

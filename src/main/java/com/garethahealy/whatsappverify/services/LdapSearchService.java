@@ -2,7 +2,6 @@ package com.garethahealy.whatsappverify.services;
 
 import com.garethahealy.whatsappverify.factories.LdapConnectionFactory;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import org.apache.directory.api.ldap.model.entry.Attribute;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.exception.LdapInvalidSearchFilterException;
@@ -12,6 +11,7 @@ import org.jboss.logging.Logger;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Handles searching Red Hat LDAP
@@ -26,7 +26,6 @@ public class LdapSearchService {
     private final Logger logger;
     private final LdapConnectionFactory connectionFactory;
 
-    @Inject
     public LdapSearchService(Logger logger, LdapConnectionFactory connectionFactory) {
         this.logger = logger;
         this.connectionFactory = connectionFactory;
@@ -59,7 +58,7 @@ public class LdapSearchService {
      * @throws LdapException
      * @throws IOException
      */
-    public String searchOnMobile(LdapConnection connection, String number) throws LdapException, IOException {
+    public Optional<String> searchOnMobile(LdapConnection connection, String number) throws LdapException, IOException {
         FilterBuilder filter = FilterBuilder.equal("mobile", number);
         return searchAndGetPrimaryMail(connection, filter);
     }
@@ -73,7 +72,7 @@ public class LdapSearchService {
      * @throws LdapException
      * @throws IOException
      */
-    public String searchOnHomePhone(LdapConnection connection, String number) throws LdapException, IOException {
+    public Optional<String> searchOnHomePhone(LdapConnection connection, String number) throws LdapException, IOException {
         FilterBuilder filter = FilterBuilder.equal("homePhone", number);
         return searchAndGetPrimaryMail(connection, filter);
     }
@@ -87,8 +86,8 @@ public class LdapSearchService {
      * @throws LdapException
      * @throws IOException
      */
-    private String searchAndGetPrimaryMail(LdapConnection connection, FilterBuilder filter) throws LdapException, IOException {
-        String answer = "";
+    private Optional<String> searchAndGetPrimaryMail(LdapConnection connection, FilterBuilder filter) throws LdapException, IOException {
+        Optional<String> answer = Optional.empty();
 
         try {
             List<Attribute> attributes = connectionFactory.search(connection, filter, AttributeKeys.PrimaryMail);
@@ -96,12 +95,13 @@ public class LdapSearchService {
             for (Attribute found : attributes) {
                 if (found.getId().equalsIgnoreCase(AttributeKeys.PrimaryMail)) {
                     logger.debugf("- returning %s == %s", AttributeKeys.PrimaryMail, found.get().toString());
-                    answer = found.get().toString();
+
+                    answer = Optional.of(found.get().toString());
                     break;
                 }
             }
         } catch (LdapInvalidSearchFilterException ex) {
-            logger.error("Unable to search on " + filter, ex);
+            logger.errorf(ex, "Unable to search on %s", filter);
         }
 
         return answer;
