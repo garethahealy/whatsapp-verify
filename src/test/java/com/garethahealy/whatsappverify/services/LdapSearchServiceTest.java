@@ -1,5 +1,6 @@
 package com.garethahealy.whatsappverify.services;
 
+import com.garethahealy.whatsappverify.factories.LdapConnectionLease;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
@@ -19,18 +20,22 @@ class LdapSearchServiceTest extends AbstractLdapConnection {
     @Test
     @EnabledIf("canConnectVpn")
     void searchOnMobile() throws Exception {
-        Optional<String> result = service.searchOnMobile(service.open(), "+44 7818511214");
+        try (LdapConnectionLease lease = service.open()) {
+            Optional<String> result = service.searchOnMobile(lease.connection(), "+44 7818511214");
 
-        assertTrue(result.isPresent());
-        assertEquals("gahealy@redhat.com", result.get());
+            assertTrue(result.isPresent());
+            assertEquals("gahealy@redhat.com", result.get());
+        }
     }
 
     @Test
     @EnabledIf("canConnectVpn")
     void searchOnHomePhoneBuildsFilterAndReturnsEmail() throws Exception {
-        Optional<String> result = service.searchOnHomePhone(service.open(), "+447725078585");
+        try (LdapConnectionLease lease = service.open()) {
+            Optional<String> result = service.searchOnHomePhone(lease.connection(), "+447725078585");
 
-        assertTrue(result.isPresent());
-        assertEquals("gahealy@redhat.com", result.get());
+            assertTrue(result.isPresent());
+            assertEquals("gahealy@redhat.com", result.get());
+        }
     }
 }

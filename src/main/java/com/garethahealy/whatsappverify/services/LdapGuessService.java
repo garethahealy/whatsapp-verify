@@ -1,5 +1,6 @@
 package com.garethahealy.whatsappverify.services;
 
+import com.garethahealy.whatsappverify.factories.LdapConnectionLease;
 import com.garethahealy.whatsappverify.model.Member;
 import com.google.i18n.phonenumbers.Phonenumber;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -42,7 +43,8 @@ public class LdapGuessService {
         Member guessed = null;
 
         if (ldapSearchService.canConnect()) {
-            try (LdapConnection connection = ldapSearchService.open()) {
+            try (LdapConnectionLease lease = ldapSearchService.open()) {
+                LdapConnection connection = lease.connection();
                 logger.infof("Attempting to guess %s", phoneToGuess.getRawInput());
 
                 guessed = searchOnMobile(connection, phoneToGuess);

@@ -1,6 +1,7 @@
 package com.garethahealy.whatsappverify.services;
 
 import com.garethahealy.whatsappverify.factories.LdapConnectionFactory;
+import com.garethahealy.whatsappverify.factories.LdapConnectionLease;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.directory.api.ldap.model.entry.Attribute;
 import org.apache.directory.api.ldap.model.exception.LdapException;
@@ -40,12 +41,7 @@ public class LdapSearchService {
         return connectionFactory.canConnect();
     }
 
-    /**
-     * Create a LdapConnection
-     *
-     * @return
-     */
-    public LdapConnection open() {
+    public LdapConnectionLease open() throws LdapException {
         return connectionFactory.open();
     }
 

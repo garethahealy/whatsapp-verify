@@ -1,5 +1,6 @@
 package com.garethahealy.whatsappverify.services;
 
+import com.garethahealy.whatsappverify.factories.LdapConnectionLease;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import io.quarkus.test.InjectMock;
@@ -41,8 +42,11 @@ class LdapGuessServiceMockTest {
 
     @Test
     void retryAttempt() throws Exception {
+        LdapConnectionLease lease = Mockito.mock(LdapConnectionLease.class);
+        when(lease.connection()).thenReturn(Mockito.mock(LdapNetworkConnection.class));
+
         when(ldapSearchService.canConnect()).thenReturn(true);
-        when(ldapSearchService.open()).thenReturn(Mockito.mock(LdapNetworkConnection.class));
+        when(ldapSearchService.open()).thenReturn(lease);
         when(ldapSearchService.searchOnMobile(any(), any())).thenThrow(new LdapException("Testing retry logic"));
 
         Phonenumber.PhoneNumber phoneToGuess = phoneNumberUtil.parse("+447725078585", null);
@@ -55,6 +59,7 @@ class LdapGuessServiceMockTest {
         }
 
         Collection<Invocation> invocations = Mockito.mockingDetails(ldapSearchService).getInvocations();
-        assertEquals(12, invocations.size());
+        // 3 attempts × (canConnect + open + failing searchOnMobile); lease.close() is on the mock lease
+        assertEquals(9, invocations.size());
     }
 }
