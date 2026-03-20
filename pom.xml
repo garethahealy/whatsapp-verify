@@ -15,7 +15,6 @@
         <quarkus.platform.version>3.32.3</quarkus.platform.version>
         <skipITs>false</skipITs>
         <surefire-plugin.version>3.5.5</surefire-plugin.version>
-        <zt-exec.version>1.12</zt-exec.version>
     </properties>
 
     <dependencyManagement>
