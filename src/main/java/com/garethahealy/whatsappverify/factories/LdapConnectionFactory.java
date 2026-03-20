@@ -43,7 +43,7 @@ public class LdapConnectionFactory {
         try {
             systemDn = new Dn(ldapConfig.dn());
         } catch (LdapException ex) {
-            logger.errorf(ex,"Invalid LDAP DN configuration");
+            throw new IllegalStateException("Invalid LDAP DN in redhat.ldap.dn: " + ldapConfig.dn(), ex);
         }
     }
 
@@ -65,7 +65,7 @@ public class LdapConnectionFactory {
         }
     }
 
-    public Dn getSystemDn() throws LdapException {
+    public Dn getSystemDn() {
         return systemDn;
     }
 
