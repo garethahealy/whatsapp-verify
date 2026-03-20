@@ -163,8 +163,9 @@ public class VerifyCommand implements Runnable {
                 logger.debugf("==> %s Verified via LDAP", current.whatsAppNumber().getRawInput());
                 answer.add(current);
             } else {
-                Optional<Member> found = lastOutputMap.values().stream().filter(last ->
-                    phoneNumberUtil.isNumberMatch(current.whatsAppNumber(), last.whatsAppNumber()) == PhoneNumberUtil.MatchType.EXACT_MATCH).findFirst();
+                Optional<Member> found = lastOutputMap.values().stream()
+                    .filter(last -> phoneNumberUtil.isNumberMatch(current.whatsAppNumber(), last.whatsAppNumber()) == PhoneNumberUtil.MatchType.EXACT_MATCH)
+                    .findFirst();
 
                 if (found.isPresent()) {
                     Member foundMember = found.get();
