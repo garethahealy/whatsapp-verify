@@ -8,6 +8,8 @@ public interface LdapConfig {
 
     String connection();
 
+    int port();
+
     String dn();
 
     @WithName("warmup-user")
