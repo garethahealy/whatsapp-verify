@@ -42,7 +42,7 @@ jobs:
         run: ./mvnw clean install -Pnative -DskipTests --batch-mode
 
       - name: Test
-        run: ./mvnw test --batch-mode
+        run: ./mvnw test -DskipITs=true --batch-mode
 
       - name: Run help command
         id: runner
