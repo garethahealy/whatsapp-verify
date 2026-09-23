@@ -1,5 +1,6 @@
 package com.garethahealy.whatsappverify.services;
 
+import com.garethahealy.whatsappverify.factories.LdapConnectionFactory;
 import com.garethahealy.whatsappverify.factories.LdapConnectionLease;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
@@ -16,6 +17,10 @@ class LdapSearchServiceTest extends AbstractLdapConnection {
 
     @Inject
     LdapSearchService service;
+
+    public LdapSearchServiceTest(LdapConnectionFactory ldapConnectionFactory) {
+        super(ldapConnectionFactory);
+    }
 
     @Test
     @EnabledIf("canConnectVpn")

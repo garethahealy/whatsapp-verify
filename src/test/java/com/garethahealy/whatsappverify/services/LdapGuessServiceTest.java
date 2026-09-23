@@ -1,5 +1,6 @@
 package com.garethahealy.whatsappverify.services;
 
+import com.garethahealy.whatsappverify.factories.LdapConnectionFactory;
 import com.garethahealy.whatsappverify.model.Member;
 import com.google.i18n.phonenumbers.Phonenumber;
 import io.quarkus.test.junit.QuarkusTest;
@@ -15,6 +16,10 @@ class LdapGuessServiceTest extends AbstractLdapConnection {
 
     @Inject
     LdapGuessService service;
+
+    public LdapGuessServiceTest(LdapConnectionFactory ldapConnectionFactory) {
+        super(ldapConnectionFactory);
+    }
 
     @Test
     @EnabledIf("canConnectVpn")
