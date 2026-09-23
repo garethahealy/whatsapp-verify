@@ -9,9 +9,15 @@ import org.apache.directory.api.ldap.model.cursor.EntryCursor;
 import org.apache.directory.api.ldap.model.entry.Attribute;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
+import org.apache.directory.api.ldap.model.message.LdapResult;
+import org.apache.directory.api.ldap.model.message.ResultCodeEnum;
+import org.apache.directory.api.ldap.model.message.SearchResultDone;
 import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
-import org.apache.directory.ldap.client.api.*;
+import org.apache.directory.ldap.client.api.DefaultPoolableLdapConnectionFactory;
+import org.apache.directory.ldap.client.api.LdapConnection;
+import org.apache.directory.ldap.client.api.LdapConnectionConfig;
+import org.apache.directory.ldap.client.api.LdapConnectionPool;
 import org.apache.directory.ldap.client.api.search.FilterBuilder;
 import org.jboss.logging.Logger;
 
@@ -71,16 +77,22 @@ public class LdapConnectionFactory {
         config.setLdapHost(ldapConfig.connection());
         config.setLdapPort(ldapConfig.port());
 
-        DefaultLdapConnectionFactory factory = new DefaultLdapConnectionFactory(config);
         GenericObjectPoolConfig<LdapConnection> poolConfig = new GenericObjectPoolConfig<>();
         poolConfig.setMaxTotal(Runtime.getRuntime().availableProcessors());
         poolConfig.setMaxIdle(Math.max(1, Runtime.getRuntime().availableProcessors() / 2));
 
-        return new LdapConnectionPool(new DefaultPoolableLdapConnectionFactory(factory), poolConfig);
+        return new LdapConnectionPool(
+                new DefaultPoolableLdapConnectionFactory(new GssapiLdapConnectionFactory(config, logger, ldapConfig.kerberos())),
+                poolConfig);
     }
 
     private void ensureWarmedUp() {
+        String host = ldapConfig.connection();
+        int port = ldapConfig.port();
+
         try {
+            logger.infof("Trying LDAP warmup against %s:%d (uid=%s)", host, port, ldapConfig.warmupUser());
+
             try (LdapConnectionLease lease = open()) {
                 LdapConnection connection = lease.connection();
 
@@ -91,10 +103,27 @@ public class LdapConnectionFactory {
                         warmedUp.set(true);
                         break;
                     }
+
+                    if (!warmedUp.get()) {
+                        logWarmupSearchFailure(cursor, host, port);
+                    }
                 }
             }
-        } catch (IOException | LdapException e) {
-            logger.error("Failed to open connection to LDAP", e);
+        } catch (Exception | UnsatisfiedLinkError e) {
+            logger.errorf(e, "Failed to connect to LDAP at %s:%d", host, port);
+        }
+    }
+
+    private void logWarmupSearchFailure(EntryCursor cursor, String host, int port) {
+        SearchResultDone done = cursor.getSearchResultDone();
+        LdapResult result = done == null ? null : done.getLdapResult();
+
+        if (result == null || result.getResultCode() == ResultCodeEnum.SUCCESS) {
+            logger.warnf("LDAP warmup search for uid=%s at %s:%d returned no entries", ldapConfig.warmupUser(), host, port);
+        } else {
+            String diagnostic = result.getDiagnosticMessage();
+            String detail = (diagnostic == null || diagnostic.isBlank()) ? "no diagnostic" : diagnostic;
+            logger.errorf("LDAP at %s:%d rejected the warmup search: %s (%s)", host, port, result.getResultCode(), detail);
         }
     }
 
@@ -113,9 +142,11 @@ public class LdapConnectionFactory {
     public List<Attribute> search(LdapConnection connection, FilterBuilder filter, String... attributes) throws LdapException, IOException {
         List<Attribute> answer = new ArrayList<>();
 
+        logger.debugf("Searching on: %s", filter);
+
         try (EntryCursor cursor = connection.search(systemDn, filter.toString(), SearchScope.SUBTREE, attributes)) {
             for (Entry entry : cursor) {
-                logger.debugf("Found %s attributes for %s", entry.getAttributes().size(), filter);
+                logger.debugf("Found %s", filter);
 
                 answer.addAll(entry.getAttributes());
             }
