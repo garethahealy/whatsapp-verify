@@ -39,7 +39,7 @@ jobs:
           ./mvnw verify -DskipTests --fail-never --batch-mode
 
       - name: Build
-        run: ./mvnw clean install -Pnative -DskipTests --batch-mode
+        run: ./mvnw clean install -Pnative -DskipTests -DskipITs=true --batch-mode
 
       - name: Test
         run: ./mvnw test -DskipITs=true --batch-mode
